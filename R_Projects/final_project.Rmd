@@ -1,0 +1,264 @@
+---
+title: "Final - Take Home"
+author: "Neriman Gürsoy"
+date: "10/01/2021"
+output: 
+  html_document:
+    number_sections: true
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+<style>
+body{
+  color: #708090 ;
+  font-family: Calibri Light;
+  background-color: #F5F5F5;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", message=FALSE, warning=FALSE, error = FALSE )
+```
+
+
+```{r, echo=FALSE, include=FALSE}
+library(dplyr)
+library(tidyverse) # used for data analyses
+library(tm) # provides a set of predefined sources
+library(knitr) # to provide report creation
+library(kableExtra)  # to provide arrangement of the tables
+library(patchwork)   # for combine plots in one lines
+library(data.table)  # for easy implementation of some loops and functions
+library(forecast)
+library(readxl)
+library(ggplot2)
+library(reshape2)
+library(tinytex)
+```
+
+
+# Part I: Short and Simple
+
+## Question 1
+
+Dr. Timnit Gebru is a computer scientist who works on algorithmic bias and data mining.She was the Staff Research Scientist and Co-Lead of Ethical Artificial Intelligence (AI) team at Google. As an Ethiopian American woman, she is known for her work that critically examines the social biases and reflections of technology. She is also an advocate for diversity in technology and co-founder of Black in AI, a community of black researchers working in artificial intelligence.She is also an advocate for diversity in technology and co-founder of Black in AI, a community of black researchers working in artificial intelligence. she actually aims to include more black people in the project with this group. Dr. Gebru was fired by her executives for a critical email that she threw contained in the company's lack of diversity.
+
+Gebru also criticizes technology companies, including Google, for omitting employee diversity or changing attitude after hiring.
+In his e-mail, Gebru criticized the company's attitude towards minority employees and Google's treatment of its workforce, especially its non-white employees.This email is also seen as a threat to rekindle anger by Google. After a leading scientist working on AI ethics was fired in this way, more than one thousand two hundred Google employees and over one thousand five hundred academic researchers signed a protest letter. Google chief executive Sundar Pichai does not accept the fact. He said that the newspaper skipped research on the subject and Dr. Gebru resigned of his own free will. According to the BBC's interview with Dr. Gebru, she says the article that was the reason for his firing was about development research and ethical considerations of developing large language models. She definitely felt she was treated differently because she was black. She also said  that if a white person was in his place he would definitely not have received this treatment. But, while Google apologizes about the way she was fired, they are not saying we are absolutely sorry for their behavior.
+
+I am definitely on the side of Dr. Gebru and her supporters. Google s behavior is quite hurtful and embarrassing. Also, a person may really feel that the behavior towards themselves and other colleagues is different. If Google thinks that the article poses a threat, it can rightfully publish the article.
+
+
+## Question 2
+
+Data analysis provides meaningful results gives ideas to take action. To make these analyses, data preparation is one of the most important steps. After the pre-processing of the data, we need to understand/deﬁne the objective(s) to make meaningful analysis. We can visualize our data to interpret outputs that give an idea about topic. In addition to visualization, we can classify the variables and furthermore we can create prediction models.
+
+In the experience and emotional decision making, variables such as the risk-taking capacity of the portfolio owner, financial literacy, duration of the investment (medium term, long term etc.) and the purpose of the investment should be taken into account.According to the combination of these variables, for example, in the long-term and medium-level risk profile, the effect of experience provides a significant return, while in the short-term and low risk profile, data analysis can be a more reliable tool in terms of return.For this reason, the investor profile is very important in terms of which side will be more effective in decision making.
+
+If we have enough data from the past years and we make statistical analyzes using this data and make a decision according to the values obtained, it would be very useful in terms of minimizing the risk. However, it is not enough to make decisions based on the results of the data we have. For example; the possibility of investing in a new company, which does not have much historical data yet, but is promising in terms of its vision and potential, is also high.
+
+
+## Question 3
+
+Nottem is a dataset made up of the average Monthly Temperatures at Nottingham, 1920–1939. It is a time series object containing average air temperatures at Nottingham Castle in degrees Fahrenheit for 20 years.
+
+
+```{r, echo=FALSE, include=FALSE}
+nottem %>%glimpse()
+```
+Time series analysis; analyzing events, transactions and transactions from time to time, and the history of internal transformation is an important technique for change. Marking the inferences and influences from those that change with the effect of time is useful for establishing a meaning relationship.
+
+In time series graphics; While there is time sequentially on the X axis, observations are visualized by combining them with straight lines on the Y axis.
+
+**Decomposition** : The seasonal effect is demonstrated as well by computing averages across years within months. Considering thetemperature series nottem, there are 20 years of data, so there are 20 January temperatures. We take these 20 January temperatures and average them to get an estimate of the over-all temperature in January.
+
+
+```{r}
+plot(decompose(nottem)) 
+```
+
+The **Decomposition of additive time series** graph shows that:
+
+The graph refers to separating a time series into trend, seasonal effects, and remaining variability
+
+- random : Unexplained increases are considered as decreases.The causes of peaks in the graph need to be investigated.It is necessary to take action to stabilize the data before putting it into the model. If we look at the graph, a decrease to -6 before year of 1930 we see that. Events need to be examined.
+
+- seasonal: Regularly repeating periods in data. Considering the data as 12 months, annual cycles, a seasonality should be expected here.
+This can be seen from this graph.
+
+- trend : It shows the trend in the sum of the time series. When we look at the graph, it is seen that there is an increasing trend.
+
+- observed : it is that the Graphical version of all data in the dataset.
+
+
+
+\newpage 
+# Part II: Extending Your Group Project
+
+In our group project we analyze service information data of x company’s dealers in Turkey. For this purpose, first we give exploratory data analysis(EDA) with dplyr, ggplot, and other packages. To make further analysis for this data set, I will make extra EDA. 
+In the analysis, we did not present the distribution of the price. Since the price is response variable and we try to predict them, the histogram of the price can be analyzed. 
+
+```{r, echo=FALSE, include=FALSE}
+data = readRDS(gzcon(url("https://github.com/pjournal/mef04g-madagaskar/blob/gh-pages/Data/x_vehicle_company_service_dataset_v4.rds?raw=true")))
+```
+
+```{r, echo=FALSE, include=FALSE}
+data %>% glimpse()
+```
+
+```{r, fig.width=10, fig.height=5 }
+
+data %>% ggplot(aes(x=log(price))) +
+  geom_histogram(aes(y=..density..), position="identity", alpha=0.8, 
+                 fill = "seashell3", color="seashell3") +
+  geom_density(alpha=1, size = 1) + theme_minimal() +
+  labs(title = "Price Distribution with Log Transformation",
+       x = "Log Price",y = "Count")
+
+```
+
+The histogram shows the output of the logarithmic transformed histogram. When we analyze the histogram, we can say that the price has normal distribution. Moreover, by using statistical hypothesis this fact can be analyzed. 
+
+Moreover, tables give another price analysis: price analysis by Dealer_id and dealer_city. 
+
+```{r}
+data %>%
+  group_by(Dealer_id, dealer_city) %>%
+  summarise(count = n(), MinPrice = min(price), 
+            AveragePrice=mean(price), 
+            MaxPrice = max(price)) %>%
+  arrange(desc(AveragePrice)) %>%
+  head(5)
+  
+```
+
+According to the results, the most sevice price in **Afyonkarahisar** for **Musteri_65**. And the least service price in **Kahramanmaras** for **Musteri_50**.
+
+```{r}
+data %>%
+  group_by(Dealer_id, dealer_city) %>%
+  summarise(count = n(), MinPrice = min(price), 
+            AveragePrice=mean(price), 
+            MaxPrice = max(price)) %>%
+  arrange(AveragePrice) %>%
+  head(5)
+```
+
+Another important factors for the vehicles put into service  is the process type and material type. In the project analysis, we analyzed the total number of vehicles  by using these two variables, but we showed that according to the material type.  In this analysis, I try to present number of vehicles according to the process type and material type that aﬀects the total service price in my opinion. To see distribution of this data I made following analysis. I showed the distribution of the material types used in the processes of the vehicles going to the service.
+
+```{r}
+data %>%
+  group_by(process_type, material_type) %>%
+  summarise(count = n()) %>%
+  
+  ggplot(.,aes(x=material_type, y = count, fill= material_type)) +
+    geom_col() +
+    facet_wrap(~process_type) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(angle = 90), legend.position = "none") +
+    scale_y_continuous(labels = function(x) format(x, scientific = FALSE)) +
+    labs(title = "Number of Vehicles with Different Process and Material",
+         x = "Process Type",
+         y = "count",
+         Fill = "process_type")
+```
+
+The results show that the most used material type for vehicles with process type **ariza** is **diger** and **parca**.
+When we look at other graphics, we can see that there are records for the same material types for vehicles with process type **P.Bakim**, **Garanti** and **Kontrol**.
+
+
+
+\newpage
+# Part III: Welcome to Real Life
+
+In this section by using data of Stock Recommendations (from İş Yatirim), exploratory data analysis will be made. To make this analysis, first the [data](https://www.isyatirim.com.tr/tr-tr/analiz/hisse/Sayfalar/takip-listesi.aspx?sektor=00#page-1) should be downloaded and prepared for the process. The data which contains 38 different stocks for Industry sector is used. The data has been prepared using Summary, Forecast Revisions and Target Revisions for the Industry sector.The prepared data can be download form the [github](https://github.com/pjournal/mef04-nerigrsy/blob/gh-pages/Final/all_data?raw=true). Then by using following code, the data can be loaded into the R-markdown.
+
+First, I examine target and closing price of stocks.
+
+```{r, echo=FALSE, include=FALSE}
+Data <- readRDS(gzcon(url("https://github.com/pjournal/mef04-nerigrsy/blob/gh-pages/Final/all_data?raw=true")))
+```
+
+```{r, echo=FALSE, include=FALSE}
+Data
+```
+
+```{r}
+Plot1 <- Data %>% group_by(Stock) %>% 
+  summarise(TargetPrice = sum(TargetPrice1Month),
+            ClosingPrice = sum(Close)) %>% ungroup() %>%
+  select(Stock, TargetPrice, ClosingPrice)
+
+Plot2 <- melt(Plot1, id.vars="Stock")
+Plot2%>% ggplot(.,aes(x=Stock, y=value, fill=variable)) + 
+  geom_bar(stat="identity", position="dodge")+
+  theme_test() +
+  scale_y_continuous(breaks=seq(from = 0, to =600 , by = 50)) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90, size=9, vjust=0.5,hjust=1))+
+  labs(title="Target vs. Close", subtitle = "Stock Recommendations Data Set",
+       x = "Stock", y = "Price", color = "Type of Price")
+
+```
+the dataset has only one seans for stocks that is 26th November, 2020. **Closed** means the closing price of stocks for that session.
+**Target Price** means the estimated price made by the investment advisory company (IS Yatirim) for price targeting. Target prices actually include the recommendations given to us. By looking at the target prices, comments are made in a way that the prices of the shares will decrease or increase.
+Accordingly, investment companies give Recommendation such as 'BUY', 'SELL' and 'HOLD'. According to the closing prices, target prices show investors in which direction to move.
+
+According to the Target vs. Close graph, For AEFES stock, target price is greater than closing price.For this stock, 'BUY' recommendation can be given.
+For OTKAR stock, difference between target and closing price is too high. Target price is less than closing price. So, for this stock, exactly can be given 'SELL' recommendation.
+
+
+```{r}
+
+Plot3 <- Data %>% group_by(Stock) %>% select(Stock, Upside)
+
+Plot4 <- melt(Plot3, id.vars="Stock")
+Plot4%>% ggplot(.,aes(x=Stock, y=value, fill=variable)) + 
+  geom_bar(stat="identity", position="dodge")+
+  theme_test() +
+  scale_y_continuous(breaks=seq(from = -50, to =50 , by = 5)) + 
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle=90, size=9, vjust=0.5,hjust=1))+
+  labs(title="Return Potential of Stocks", 
+       subtitle = "Stock Recommendations Data Set",
+       x = "Stock", y = "Upside (%)")
+
+```
+**Upside** is a return potential of stocks. A person who wants to invest can also decide which stock to choose based on the upside value of the stocks.
+When we look at the graph, we can say that some stocks have negative values. Let's think of someone with 10000 TL. if she/he buys TCELL stock she/he will earn much more, because the upside value is 28 percent. He/She will not buy the OTKAR stock with a 37 percent return value. 
+
+
+Lastly, I will examine the target revisions of stocks.TargetPrice_1MonthAgo shows the estimated target price value 1 month ago of stocks.TargetPrice_3MonthsAgo shows that the estimated target price value 3 months ago of stocks. When we compare these three values, we expect the current target price to be higher than the target price a month ago. we also expect the target price one month ago to be higher than the target price three months ago. 
+With this value, we can truly predict that the stock will increase or decrease even more.
+
+```{r}
+Plot5 <- Data %>% group_by(Stock) %>% summarise(TargetPrice = sum(TargetPrice),
+            TargetPrice_1MonthAgo = sum(TargetPrice1Month),
+            TargetPrice_3MonthsAgo = sum(TargetPrice3Months)) %>% ungroup() %>%
+  select(Stock, TargetPrice, TargetPrice_1MonthAgo, TargetPrice_3MonthsAgo )
+
+Plot6 <- melt(Plot5, id.vars="Stock")
+Plot6 %>% ggplot(.,aes(x=Stock, y=value, fill=variable)) + 
+  geom_bar(stat="identity", position="dodge")+
+  theme_test() +
+  scale_y_continuous(breaks=seq(from = 0, to =300 , by = 50)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle=90, size=6, vjust=0.5,hjust=1))+
+  labs(title="Comparison of Target Prices",
+       subtitle = "Stock Recommendations Data Set",
+       x = "Stock", y = "Price", color = "Type of Price")
+```
+According to the Comparison of Target Prices graph, we can observe the positive or negative trend of the investment advisors' expectation for the stocks.For **KOZAL** stock, when we look at the values, the expectation of the investment advisors' has been revised negatively. We observe that the potential return expectation of this stock has decreased.
+For **FROTO** stock, we can say that the probability of potential return has increased.
+
+
