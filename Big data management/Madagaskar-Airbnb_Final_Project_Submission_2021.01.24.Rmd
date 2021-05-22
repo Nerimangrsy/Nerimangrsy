@@ -1,0 +1,447 @@
+---
+title: "Group Project"
+author: "Madagaskar"
+date: "24 01 2021"
+output: 
+  html_document:
+    code_folding: hide
+    toc: yes
+    toc_depth: 3
+    toc_float:
+      collapsed: no
+    theme: united
+    highlight: tango
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+  word_document:
+    toc: yes
+    toc_depth: '3'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", message = FALSE, warning = FALSE, error = FALSE)
+```
+
+
+<style>
+#TOC {
+ color: 
+ font-family: Calibri;
+ background-color:
+ border-color: darkred;
+}
+#header {
+ color: darkred;
+ font-family: Calibri;
+ background-color:
+}
+body {
+ font-family: Calibri;
+ }
+ 
+</style>
+
+
+## MILAN AIRBNB 2020
+
+## 1. Introduction
+
+### 1.1 Milan Airbnb 2020 Dataset
+
+The dataset used in this project belongs to a airbnb website in Milan.It is called Milan Airbnb Dataset 2020 and downloaded from [Kaggle](https://www.kaggle.com/ankit1661/milan-airbnb-dataset-2020). The dataset contains information about features of host and rented place has been filled by hosts.
+AirBnb is a platform that allows hosts to rent part or all of their home, bringing home owners and tenants together.  In order to overcome the rows with missing values, a preprocessing of data is conducted and can be seen in Preprocessing Section for detailed explanations. This section also includes some accuracy checks of the data, and explanations od the variables.
+
+
+### 1.1 Objectives
+
+In this project, we will first investigate the data for preprocessing to improve its quality. Then we will perform an exploratory data analysis(EDA) by data manipulation and data visualization steps. The main purpose is to identify which variables affect the price mostly and come up with a conclusion for the relationship between variables.The processes during the assignment can be listed as below:
+
+- Create databases
+- Data Preprocessing
+- Data Manipulation
+- Data Visualization
+
+### 1.3 Used Packages
+
+The packages used during the project can be listed as below:
+
+1. tidyverse
+2. lubridate
+3. sqldf
+4. knitr
+5. reshape
+6. patchwork
+7. kableExtra
+8. gridextra
+
+
+```{r packages, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(sqldf)
+library(gridExtra)
+library(ggpubr)
+library(kableExtra)
+library(ggmap)
+library(reshape)
+library(patchwork)   
+
+```
+
+## 2. Data Preprocessing
+
+### 2.1 Data 
+
+
+At first, we need to upload the dataset. There are three different csv file. The main data is listings.csv, reviews.csv and calendar.csv are the assistant.
+After uploading the files, we put them all together and converted them to .RData format.
+
+To do so, you can run the following command:
+
+```{r,include=FALSE}
+calendar<- read.csv("C:/Users/bsivas/Desktop/BDA/BDA505- Group Project/Data/calendar.csv")
+listing<- read.csv("C:/Users/bsivas/Desktop/BDA/BDA505- Group Project/Data/listings.csv")
+review<-read.csv("C:/Users/bsivas/Desktop/BDA/BDA505- Group Project/Data/reviews.csv")
+
+save(calendar,listing,review, file = "MilanAirbnb.RData")
+
+```
+
+```{r, include=FALSE}
+MilanAirbnb<-load("C:/Users/bsivas/Desktop/BDA/BDA505- Group Project/MilanAirbnb.RData")
+```
+
+After uploading the files we converted them into dataframe.
+
+```{r}
+
+calendar_df<- data_frame(calendar)
+listing_df<- data_frame(listing)
+review_df<- data_frame(review)
+
+```
+
+
+### 2.2 Data Information
+
+These are explanations for the specific variables which were used for exploratory data analysis part.
+
+- id                                           :The uniq identification number of rent advertisement
+- Listing id                                   :The uniq identification number of which was specific for airbnb users about rent advertisement.
+- name                                         :The name of rent advertisement.
+- host_id                                      :The uniq identification number for rented houses.
+- host_name                                    :The name of rented house
+- neighbourhood_cleansed                       :The information of the region where the rented houses are located in.
+- latitude                                     :The latitude value of rented house
+- longitude                                    :The longitude value of rented house
+- property_type                                :The detail about which part of house can be rented such as "full house", "one room of house","private villa" etc. 
+- price                                        :The price value for rent advertisement for one night
+- minimum_nights                               :The number of minimum required night which should be rented for 
+- maximum_nights                               :The number of maximum required night which should be rented for
+- has_availability                             :Information about that house is suitable for being rented or not
+- number_of_reviews                            :The detailed number of information how many review was written for that house
+- review_scores_rating                         :The number of rating scores from previous visitors for that house
+- review_scores_accuracy                       :The number of review accuracy scores from previous visitors for that house
+- review_scores_cleanliness                    :The number of review cleanliness scores from previous visitors for that house
+- review_scores_communication                  :The number of review communication scores from previous visitors for that house
+- review_scores_location                       :The number of review location scores from previous visitors for that house
+
+ **The Calendar Table :** 
+ 
+```{r, eval=FALSE}
+sqldf("select * from calendar_df limit 5")
+```
+```{r}
+glimpse(calendar_df)
+
+```
+ 
+ **The Listing Table :** 
+
+```{r, eval=FALSE}
+sqldf("select * from listing_df limit 5")
+```
+
+```{r}
+glimpse(listing_df)
+```
+ **The Review Table : **
+
+```{r, eval=FALSE}
+sqldf("select * from review_df limit 5")
+```
+
+```{r}
+glimpse(review_df)
+```
+
+### 2.3 Handling NA Values
+
+The dataset was checked if there was any null values in the data or not.
+
+```{r}
+any(is.na(calendar_df))
+any(is.na(listing_df))
+any(is.na(review_df))
+```
+
+After realizing that dataset has null values in it, the columns which has most null values were extracted from dataset according to the codes showns as below.
+
+
+```{r}
+
+listing_df<-listing_df%>%select(-c("neighbourhood_group_cleansed", "bathrooms","calendar_updated","license"))
+listing_df<-listing_df %>% mutate_if(is.character, list(~na_if(.,"N/A"))) 
+```
+
+
+```{r}
+calendar_df<-na.omit(calendar_df)
+review_df<-na.omit(review_df)
+listing_df<-na.omit(listing_df)
+```
+
+### 2.4 Check Accuracy of Values
+
+Before starting any of the analysis, the accuracy of values were also checked like looking into the Price column.
+
+```{r}
+head(calendar_df$price)
+```
+The dolar '$' sign was removed from the **calendar table** and the price was converted to data type as numeric.
+
+
+```{r}
+calendar_df$date<-as.POSIXct(calendar_df$date,format = "%Y-%m-%d")
+calendar_df$price<- sub('$', '', calendar_df$price, fixed = TRUE)
+calendar_df$price<-as.numeric(calendar_df$price)
+
+price<- sqldf("select date, sum(price) total_price
+              from calendar_df group by date")
+
+head(price)
+```
+
+
+
+```{r}
+head(listing_df$price)
+```
+The dolar '$' sign was removed from the **listing table** and the price was converted to data type as numeric.
+
+```{r}
+listing_df$price<- sub('$', '', listing_df$price, fixed = TRUE)
+listing_df$price<-as.numeric(listing_df$price)
+
+head(listing_df$price)
+```
+After those preprocessing period, the data is ready for exploratory data analysis(EDA).
+
+
+
+```{r}
+calendar_df$date<-as.POSIXct(calendar_df$date,format = "%Y-%m-%d")
+
+```
+
+
+
+## 3. Exploratory  Data Analysis - EDA
+
+### 3.1 The Most Popular Provinces
+
+According to the codechuck below, the most popular regions were ordered according to their descending average prices.
+
+Giardini Porta Venezia is the first region with its highest avarege prices nearly two times of the second region in the list. The main reasons of this listing could be like that:
+
+
+- Giardini Porta Venezia is the most historical place of Milano. The oldest city park, the Natural History Museum and Planetarium are located there. It is the most expensive neighborhood due to being historical and touristic.
+Tre Torri is the most important business center in Milano. This can explain why it is in the second row in the list.
+Duomo di Milona is the second-highest cathedral in Italy and takes place in the Duomo district. Because of this reason, Duomo has the third place.
+
+
+
+```{r, fig.width=8, fig.height=6}
+
+neigh_price<-sqldf("select neighbourhood_cleansed neighbourhood, avg(price) avg_price from listing_df
+                   group by neighbourhood_cleansed order by avg(price) desc limit 20 ")
+
+
+neigh_price
+
+```
+
+```{r}
+neigh_price%>% ggplot(aes(x=avg_price, y=reorder(neighbourhood, avg_price), fill=avg_price)) +
+  geom_col() +
+  scale_fill_gradient("avg_price", low="thistle1", high="thistle4") +
+  geom_text(aes(label = paste(format(avg_price,digits=1), "$")), size=4, position = position_stack(vjust = 0.5)) +
+  theme_minimal() +
+  theme(legend.position = "none", plot.title = element_text(vjust = 1)) +
+  labs(x = "Average Price",
+       y = "Neighbourhood",
+       title = "The Most Popular Houses")
+```
+
+### 3.2 Price Distribution of Houses
+
+It can be seen from below analysis, the prices were distributed as right skewed manner in the left graph. For this reason the distribution was rearrange via using logarithmic transformation in the right structure. 
+
+The right histogram shows the output of the transformed histogram. According to the second histogram, it can be said that the price has normal distribution. Moreover, by using statistical hypothesis this fact can be analyzed.
+
+```{r, fig.width=10, fig.height=5}
+
+a <- listing_df %>% ggplot(aes(x=price)) +
+  geom_histogram(aes(y=..density..), position="identity", alpha=0.8, fill = "paleturquoise4", color="paleturquoise4") +
+  geom_density(alpha=1, size = 1) + theme_minimal() +
+  labs(title = "Price Distribution with Histogram", subtitle = "Milan Airbnb Dataset 2020",
+       x = "Price",y = "Density")
+
+b <- listing_df %>% ggplot(aes(x=log(price))) +
+  geom_histogram(aes(y=..density..), position="identity", alpha=0.8, fill = "paleturquoise4", color="paleturquoise4") +
+  geom_density(alpha=1, size = 1) + theme_minimal() +
+  labs(title = "Price Distribution with Log Transformation",x = "Log Price",y = "Density")
+
+(a|b)
+
+
+```
+
+
+
+### 3.3 The Top 20 Provinces with Highest Feedbacks
+
+In this analysis the top 20 regions were listed according to their feedback numbers and avarege ratings.
+
+```{r, fig.width=8, fig.height=10}
+
+score<- sqldf("select name, avg(review_scores_rating) avg_rating,
+                          sum(number_of_reviews) review_count from listing_df
+                          group by name order by sum(number_of_reviews) desc limit 20 ")
+
+
+p1<-qplot(name, avg_rating, data=score, fill=name) + ggtitle("Average Rating")+
+theme(axis.text.x = element_text(angle=90, size=6, vjust=1,hjust=1, ),
+  legend.position = "None") +  
+  geom_col(stat="identity", position=position_dodge(0.8), width=0.6) +
+  labs(x="House Name", y="Average Rating")
+
+p2<-qplot(name, review_count, data=score, fill=name) + ggtitle("Review Count")+
+theme(axis.text.x = element_text(angle=90, size=6, vjust=1,hjust=1),
+      legend.position = "None") + 
+  geom_col(stat="identity", position=position_dodge(0.8), width=0.6) + 
+  labs(x="House Name", y="Review Count")
+
+ggarrange(p1,p2 ,ncol = 1,nrow=2)
+```
+
+### 3.4 The Table of Neighbourhood with Their Required Min. Max Nights
+
+```{r}
+
+available<- sqldf("select distinct neighbourhood_cleansed, min(cd.minimum_nights) min_night, 
+                  max(cd.maximum_nights) max_night
+                  from listing_df ld inner join calendar_df cd on ld.id=cd.listing_id
+                   group by neighbourhood_cleansed
+                  order by min(cd.minimum_nights) desc limit 20")
+
+kable(available,col.names = c("Neighbourhood", "Minimum Nights.", "Maxsimum Nights"))%>%
+kable_styling("striped", full_width = F) %>%
+  scroll_box(width = "100%", height = "400px")
+
+
+```
+
+### 3.5 Number of The Rented Place Based on the Type
+
+In this analysis the distrubution of the year 2020 whole rent advertisement can be seen related with their property types. In order to make pie chart more readable a filter function was used to ignore property types which has less number than 10.
+
+It was obvious that type of "Entire apartment" is the number one in the list with its high percentage nearly % 65.
+
+```{r}
+property <- sqldf("select distinct property_type ,count(*) value from listing_df 
+                  group by property_type
+                  having count(*)>10
+                  order by count(*) desc ")
+
+property
+```
+```{r}
+ggplot(property, aes(x="", y=value, fill=property_type)) + 
+  geom_bar(stat="identity") + 
+  coord_polar("y") + 
+  ggtitle("Number of the rented place based on the type") +
+  theme_minimal()+ 
+  theme(axis.title.y = element_blank(), plot.title = element_text(hjust=0.5))
+```
+
+### 3.6 The Neighbourhoods Have Higher Review Scores
+
+The reviews of the houses were occured with 6 different versions in different coulmns in dataset.
+
+After a quick snapshot, cleanless, location and communication reviews were selected for this analysis to understand the popularity of the rented houses more clearly. 
+
+After sorted the provinces according to their reviews in these 3 variables, they filtered as higher reviews points than 9.5 with final 10 regions as below.
+
+```{r}
+
+review <- sqldf("select distinct host_id, neighbourhood_cleansed,
+               avg(review_scores_accuracy) accuracy, 
+               avg(review_scores_cleanliness) cleanliness ,
+               avg(review_scores_checkin) checkin ,
+               avg(review_scores_communication) communication,
+               avg(review_scores_location) location,
+               avg(review_scores_value) value from listing_df
+               group by host_id, neighbourhood_cleansed")
+
+review_df  <- data_frame(review)
+
+
+```
+```{r}
+review_df1 <- sqldf("select distinct neighbourhood_cleansed, avg(accuracy) accuracy,
+                    avg(cleanliness) cleanliness, avg(checkin) checkin, 
+                    avg(communication) communication, avg(location) location,
+                    avg(value) value from review_df
+                    group by neighbourhood_cleansed")
+
+```
+
+```{r}
+top <- sqldf ("select neighbourhood_cleansed ,
+              cleanliness, location, communication
+              from review_df1
+              where cleanliness>9.5 and location > 9.5 and communication > 9.5")
+
+top
+
+```
+
+```{r}
+
+top1 <- melt(top, id.vars="neighbourhood_cleansed")
+
+ggplot(top1, aes(x = neighbourhood_cleansed, y = value, fill= variable))+
+  geom_bar(stat="identity", position=position_dodge(0.8), width=0.6) +
+  theme(axis.text.x = element_text(angle=90, size=6, vjust=0.5,hjust=1)) +
+  labs(title = "The Neighbourhoods Have Higher Review Scores", y= "Average review score (0-10)", x= 'Neighbourhoods' ,fill="Type of Criteria")
+```
+
+## 4. Conclusion
+
+In this project, the data of the Milan airbnb houses was tried to be understand in order to make a readable review output for those people who wants to take information of this city.
+
+The results of the analysis were shown as below:
+
+- The Most Popular Provinces
+
+- Price Distribution of Houses
+
+- The Top 20 Provinces with Highest Feedbacks
+
+- The Table of Neighbourhood with Their Reqired Min. Max Nights
+
+- Number of The Rented Place Based on the Type
+
+- The Neighbourhoods Have Higher Review Scores
